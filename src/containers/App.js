@@ -17,20 +17,26 @@ import './App.css';
 // catch errors from the cards
 import ErrorBoundry from '../components/ErrorBoundry';
 
+/********/
+
 // import Actions
-import {setSearchField} from '../actions';
+import {setSearchField, requestRobots} from '../actions';
 
 const mapStateToProps = (state) => {
     return {
         // The searchField we are returning will come from our reducer.
-        searchField: state.searchField
+        searchField: state.searchRobots.searchField,
+        robots: state.requestRobots.robots,
+        isPending: state.requestRobots.isPending,
+        error: state.requestRobots.error
     }
 }
 
 // this dispatch triggers the action to go into the reducer
 const mapDispatchToProps = (dispatch) => {
     return {
-        onSearchChange: (event) => dispatch(setSearchField(event.target.value))
+        onSearchChange: (event) => dispatch(setSearchField(event.target.value)),
+        onRequestRobots: () => dispatch(requestRobots())
     }
 }
 
@@ -42,35 +48,21 @@ const mapDispatchToProps = (dispatch) => {
 
 
 class App extends Component {
-    // declares our state
-    constructor () {
-        super();
-        this.state = {
-            robots: []
-        };
-    }
-
     // after this component mounted AND is rendered run this function
     componentDidMount() {
         // fetches this 
-        fetch('https://jsonplaceholder.typicode.com/users').then(response => {
-            // convert the response to json
-            return response.json();
-        }).then(users => {
-            this.setState({robots: users});
-        })
+        this.props.onRequestRobots();
     }
 
     // render robots dynamically based on passed in state
     render() {
-        const {robots} = this.state;
-        const { searchField, onSearchChange } = this.props;
+        const { searchField, onSearchChange, robots, isPending } = this.props;
         const filteredRobots = robots.filter(robot => {
             return robot.name.toLowerCase().includes(searchField.toLowerCase());
         });
 
         // if getting the response back from the API took a really long time
-        if (!robots.length) {
+        if (isPending) {
             return <h1 className='tc title'>Loading...</h1>
         } else {
             return (
