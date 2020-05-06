@@ -1,4 +1,6 @@
 import React, {Component} from 'react';
+// Import connect
+import { connect } from 'react-redux';
 
 // List of cards
 import CardList from '../components/CardList';
@@ -15,6 +17,23 @@ import './App.css';
 // catch errors from the cards
 import ErrorBoundry from '../components/ErrorBoundry';
 
+// import Actions
+import {setSearchField} from '../actions';
+
+const mapStateToProps = (state) => {
+    return {
+        // The searchField we are returning will come from our reducer.
+        searchField: state.searchField
+    }
+}
+
+// this dispatch triggers the action to go into the reducer
+const mapDispatchToProps = (dispatch) => {
+    return {
+        onSearchChange: (event) => dispatch(setSearchField(event.target.value))
+    }
+}
+
 // what our state should have
 // const state = {
 //     robots: robots
@@ -27,8 +46,7 @@ class App extends Component {
     constructor () {
         super();
         this.state = {
-            robots: [],
-            searchfield: ''
+            robots: []
         };
     }
 
@@ -43,17 +61,12 @@ class App extends Component {
         })
     }
 
-    // random function name, but we just want to do this ON AN ACTION
-    onSearchChange = (event) => {
-        //console.log(event.target.value);
-        this.setState({searchfield: event.target.value});
-    }
-
     // render robots dynamically based on passed in state
     render() {
-        const {robots, searchfield } = this.state;
+        const {robots} = this.state;
+        const { searchField, onSearchChange } = this.props;
         const filteredRobots = robots.filter(robot => {
-            return robot.name.toLowerCase().includes(searchfield.toLowerCase());
+            return robot.name.toLowerCase().includes(searchField.toLowerCase());
         });
 
         // if getting the response back from the API took a really long time
@@ -63,7 +76,7 @@ class App extends Component {
             return (
                 <div className='tc'>
                     <h1 className='f2 title'>RoboFriends</h1>
-                    <SearchBox searchChange={this.onSearchChange} />
+                    <SearchBox searchChange={onSearchChange} />
                     <Scroll>
                         <ErrorBoundry>
                             <CardList robots={filteredRobots}/>
@@ -75,4 +88,8 @@ class App extends Component {
     }
 }
 
-export default App;
+// connect it: it's a higher function so it RETURNS another function
+// https://scotch.io/courses/5-essential-react-concepts-to-know-before-learning-redux/higher-order-components-in-react
+// Connect RUNS and the returns another function which then runs with the App parameter.
+// App now knows there's a redux store somewhere!
+export default connect(mapStateToProps, mapDispatchToProps)(App);

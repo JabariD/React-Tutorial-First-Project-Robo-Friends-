@@ -9,9 +9,24 @@ import App from './containers/App.js';
 import * as serviceWorker from './serviceWorker';
 import 'tachyons';
 
+// import Redux here
+import {Provider, connect} from 'react-redux';
+// import Store
+import { createStore } from 'redux';
+
+// import searchRobots to be used for reducers
+import { searchRobots } from './reducers';
+
+// Create the store for Redux
+const store = createStore(searchRobots)
+
+
+
 // App can be changed too: <h1>Hello</h1>
 ReactDOM.render( 
-        <App/>
+        <Provider store={store}>
+                <App/>
+        </Provider>
         , document.getElementById('root'));
 
         // If you want your app to work offline and load faster, you can change
