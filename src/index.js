@@ -10,15 +10,18 @@ import * as serviceWorker from './serviceWorker';
 import 'tachyons';
 
 // import Redux here
-import {Provider, connect} from 'react-redux';
+import { Provider, connect } from 'react-redux';
 // import Store
-import { createStore } from 'redux';
+import { createStore, applyMiddleware } from 'redux';
+// import logger
+import { createLogger } from 'redux-logger'
 
 // import searchRobots to be used for reducers
 import { searchRobots } from './reducers';
 
+const logger = createLogger();
 // Create the store for Redux
-const store = createStore(searchRobots)
+const store = createStore(searchRobots, applyMiddleware(logger))
 
 
 
